@@ -11,9 +11,11 @@ using namespace std;
 using namespace cv;
 
 int main() {
-	cout << "OpenCV version is: " << CV_VERSION;
+	cout << "OpenCV version is: " << CV_VERSION << endl;
 
-	Mat frame;
+	Mat frame, hsvFrame, maskFrame;
+
+	cv::cuda::GpuMat hsvGPU, frameGPU, maskGPU;
 
 	VideoCapture cap;
 
@@ -24,26 +26,22 @@ int main() {
 		return -1;
 	}
 
-	Scalar lbound(39, 74, 23);
-	Scalar ubound(349, 36, 35);
+	Scalar lbound(3, 112, 112);
+	Scalar ubound(50, 255, 255);
 
 	while (true) {
 		cap.read(frame);
 
-		Mat hsvFrame;
-
-		cv::cuda::GpuMat hsvGpu;
-		//hsvGpu.upload(hsvFrame);
-		cv::cuda::GpuMat frameGPU;
 		frameGPU.upload(frame);
-		cv::cuda::cvtColor(frameGPU, hsvGpu, COLOR_BGR2HSV);
+		cv::cuda::cvtColor(frameGPU, hsvGPU, COLOR_BGR2HSV);
+		hsvGPU.download(hsvFrame);
 
-		//Mat mask;
-		//cv::cuda::inRange(hsvFrame, lbound, ubound, mask);
+		cv::cuda::inRange(hsvGPU, lbound, ubound, maskGPU);
+		maskGPU.download(maskFrame);
 
 		imshow("Video Feed", frame);
-		imshow("HSV", hsvGpu.download());
-		//imshow("Mask", mask);
+		imshow("HSV", hsvFrame);
+		imshow("Mask", maskFrame);
 
 		if (waitKey(1) > 0) {
 			break;
