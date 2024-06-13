@@ -26,8 +26,8 @@ int main() {
 		return -1;
 	}
 
-	Scalar lbound(3, 112, 112);
-	Scalar ubound(50, 255, 255);
+	Scalar lbound(0, 130, 200);
+	Scalar ubound(30, 255, 255);
 
 	while (true) {
 		cap.read(frame);
